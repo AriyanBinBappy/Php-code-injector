@@ -1,9 +1,6 @@
 # Octo Dark Cyber Squad PHP Injector Tool
 
-![Banner](https://raw.githubusercontent.com/yourusername/yourrepo/main/banner-image.png)  
-*(Optional: Add your banner image link here)*
 
----
 
 ## 🛠️ Overview
 
